@@ -101,6 +101,8 @@ recognition.onresult = function(event) {
     try {
         movimento = interpretador.entry(fala);
 
+        console.log(movimento);
+
         // game.square_clicked(translate_board[movimento[1]]);
         // game.square_clicked(translate_board[movimento[2]]);
         
