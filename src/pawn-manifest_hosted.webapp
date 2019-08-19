@@ -20,5 +20,13 @@
     "name": "Oliver Merkel",
     "url": "https://github.com/OMerkel/p4wn"
   },
-  "installs_allowed_from": ["*"]
+  "installs_allowed_from": ["*"],
+    "permissions": {
+        "audio-capture" : {
+            "description" : "Audio capture"
+        },
+        "speech-recognition" : {
+            "description" : "Speech recognition"
+        }
+    }
 }
