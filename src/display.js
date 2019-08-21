@@ -258,11 +258,15 @@ _p4d_proto.write_board_html = function(){
             td.className = (x + y) & 1 ? P4WN_BLACK_SQUARE : P4WN_WHITE_SQUARE;
             _add_event_listener(td, 'click',
                                 function(p4d, n){
+                                    td.setAttribute('data-key', n);
+                                    td.setAttribute('data-position', Object.keys(translate_board).find(key => translate_board[key] === n));
+
                                     return function(e){
                                         p4d.square_clicked(p4d.orientation ? 119 - n : n);
                                     };
                                 }(this, i));
             var img = p4d_new_child(td, "img");
+            
             pieces[i] = img;
             img.src = P4WN_IMAGE_DIR + '/' + P4WN_IMAGE_NAMES[0];
             img.width= P4WN_SQUARE_WIDTH;
