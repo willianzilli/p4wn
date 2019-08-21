@@ -66,3 +66,7 @@ body {
 .p4wn-wrapper{
   /*border: 1px solid yellow;*/
 }
+
+.p4wn-board td:after { content: attr(data-position); position: relative; z-index: 9;font-weight: bold;font-family: sans-serif;font-size: 10px;}
+.p4wn-board td.p4wn-white-square:after { color: black; }
+.p4wn-board td.p4wn-black-square:after { color: white; }
