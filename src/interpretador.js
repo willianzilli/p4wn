@@ -59,6 +59,7 @@ class Interpretador {
     }
 
     // talvez a distancia de lenveinstein ajude a processar a particula
+    // Soundex Distance Metric
     processaParticulas(transcription) {
         let particulas = [];
 
