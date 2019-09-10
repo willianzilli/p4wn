@@ -21,7 +21,7 @@ else if (this.console === undefined){//MSIE
     p4_log = function(){};
 }
 else {
-    p4_log = function(){console.log.apply(console, arguments);};
+    p4_log = function(){console.warn.apply(console, arguments);};
 }
 
 /*MSIE Date.now backport */
@@ -1050,15 +1050,65 @@ function p4_move(state, s, e, promotion){
         flags |= P4_MOVE_FLAG_MATE;
 
     var movestring = p4_move2string(state, s, e, S, promotion, flags, moves);
-    p4_log("successful move", s, e, movestring, flags);
+    p4_log("successful move", Object.keys(posicoes).find(key => posicoes[key].pos === s) + " -> " + Object.keys(posicoes).find(key => posicoes[key].pos === e) + " | Notation: "+ movestring + " | Flag: "+ flags);
     state.prepared = false;
     return {
         flags: flags,
         string: movestring,
-        ok: true
+        ok: true,
+        captured_piece: E,
+        captured_position: e
     };
 }
 
+function p4_should_move(state, s, e, promotion){
+    var colour = state.to_play;
+    
+    if (s != parseInt(s)){
+        if (e === undefined){
+            var mv = p4_interpret_movestring(state, s);
+            s = mv[0];
+            e = mv[1];
+            if (s == 0)
+                return {flags: P4_MOVE_ILLEGAL, ok: false};
+            promotion = mv[2];
+        }
+        else {/*assume two point strings: 'e2', 'e4'*/
+            s = p4_destringify_point(s);
+            e = p4_destringify_point(e);
+        }
+    }
+    if (promotion === undefined)
+        promotion = P4_QUEEN;
+
+    /*See if this move is even slightly legal, disregarding check.
+     */
+    var i;
+    var legal = false;
+    p4_maybe_prepare(state);
+    var moves = p4_parse(state, colour, state.enpassant, 0);
+    for (i = 0; i < moves.length; i++){
+        if (e == moves[i][2] && s == moves[i][1]){
+            legal = true;
+            break;
+        }
+    }
+    if (! legal) {
+        return {flags: P4_MOVE_ILLEGAL, ok: false};
+    }
+
+    /*Try the move, and see what the response is.*/
+    var changes = p4_make_move(state, s, e, promotion);
+
+    /*is it check? */
+    if (p4_check_check(state, colour)){
+        return {flags: P4_MOVE_ILLEGAL, ok: false, string: "in check!"};
+    }
+
+    p4_unmake_move(state, changes);
+
+    return { flags: P4_MOVE_FLAG_OK, ok: true };
+}
 
 function p4_move2string(state, s, e, S, promotion, flags, moves){
     var piece = S & 14;
@@ -1295,7 +1345,7 @@ function p4_fen2state(fen, state){
         if (castle !== undefined){
             state.castles |= castle;
             if (castle == 0){
-                console.log("FEN claims castle state " + fen_castles +
+                console.warn("FEN claims castle state " + fen_castles +
                             " but pieces are not in place for " + c);
             }
         }
@@ -1331,6 +1381,9 @@ function p4_fen2state(fen, state){
     state.prepared = false;
     state.position_counts = {};
     /* Wrap external functions as methods. */
+    state.should_move = function(s, e, promotion){
+        return p4_should_move(this, s, e, promotion);
+    };
     state.move = function(s, e, promotion){
         return p4_move(this, s, e, promotion);
     };

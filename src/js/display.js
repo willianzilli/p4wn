@@ -68,6 +68,13 @@ function _event_target(e){
     return (e.currentTarget) ? e.currentTarget : e.srcElement;
 }
 
+_p4d_proto.valid_move = function(movimento){
+    var state = this.board_state;
+    let should_move = state.should_move(movimento[0].pos, movimento[1].pos);
+
+    return should_move.ok;
+}
+
 _p4d_proto.square_clicked = function(square){
     var board = this.board_state.board;
     var mover = this.board_state.to_play;
@@ -96,6 +103,24 @@ _p4d_proto.move = function(start, end, promotion){
     if(move_result.ok){
         this.display_move_text(state.moveno, move_result.string);
         this.refresh();
+
+        if (move_result.captured_piece != 0) {
+            let element = (move_result.captured_piece % 2 == 0) ? 
+                document.querySelector('.white_captured_piece') : 
+                document.querySelector('.black_captured_piece');
+            
+            let square = document.querySelector(`[data-key="${move_result.captured_position}"]`);
+            let animate = (square.classList.toString() == "p4wn-black-square") ?
+                "p4wn2-anime-black-square" : "p4wn2-anime-white-square";
+
+            square.classList.add(animate);
+
+            let img = p4d_new_child(element, "img");
+            img.src = P4WN_IMAGE_DIR + '/' + P4WN_IMAGE_NAMES[move_result.captured_piece];
+            img.width= P4WN_SQUARE_WIDTH;
+            img.height= P4WN_SQUARE_HEIGHT;
+        }
+
         if (! (move_result.flags & P4_MOVE_FLAG_MATE)){
             this.next_move_timeout = window.setTimeout(
                 function(p4d){
@@ -118,7 +143,7 @@ _p4d_proto.next_move = function(){
     var mover = this.board_state.to_play;
     if (this.players[mover] == 'computer' &&
         this.auto_play_timeout === undefined){
-        var timeout = (this.players[1 - mover] == 'computer') ? 500: 10;
+        var timeout = (this.players[1 - mover] == 'computer') ? 500: 750;//10;
         var p4d = this;
         this.auto_play_timeout = window.setTimeout(function(){p4d.computer_move();},
                                                    timeout);
@@ -133,7 +158,7 @@ _p4d_proto.computer_move = function(){
     var start_time = Date.now();
     mv = state.findmove(depth);
     var delta = Date.now() - start_time;
-    p4_log("findmove took", delta);
+    p4_log("computer: findmove took", delta);
     if (P4WN_ADAPTIVE_LEVELS && depth > 2){
         var min_time = 25 * depth;
         while (delta < min_time){
@@ -259,7 +284,7 @@ _p4d_proto.write_board_html = function(){
             _add_event_listener(td, 'click',
                                 function(p4d, n){
                                     td.setAttribute('data-key', n);
-                                    td.setAttribute('data-position', Object.keys(translate_board).find(key => translate_board[key] === n));
+                                    td.setAttribute('data-position', Object.keys(posicoes).find(key => posicoes[key].pos === n));
 
                                     return function(e){
                                         p4d.square_clicked(p4d.orientation ? 119 - n : n);

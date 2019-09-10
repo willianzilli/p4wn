@@ -70,3 +70,29 @@ body {
 .p4wn-board td:after { content: attr(data-position); position: relative; z-index: 9;font-weight: bold;font-family: sans-serif;font-size: 10px;}
 .p4wn-board td.p4wn-white-square:after { color: black; }
 .p4wn-board td.p4wn-black-square:after { color: white; }
+
+.p4wn2-anime-white-square,
+.p4wn2-anime-black-square {
+  animation-duration: 750ms;
+  animation-iteration-count: 4;
+}
+
+.p4wn2-anime-white-square {
+  animation-name: animeWhiteSquare;
+}
+
+.p4wn2-anime-black-square {
+  animation-name: anime-black-square;
+}
+
+@keyframes animeWhiteSquare {
+  0% {background-color: #ffe0b7;}
+  50% {background-color: #ffb047;}
+  100% {background-color: #ffe0b7;}
+}
+
+@keyframes anime-black-square {
+  0% {background-color: #d67b46;}
+  50% {background-color: #ad4102;}
+  100% {background-color: #d67b46;}
+}
