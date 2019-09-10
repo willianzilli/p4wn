@@ -1,0 +1,24 @@
+{
+    "version": "3.00",
+    "name": "p4wn3",
+    "description": "p4wn3 - chess w/ offline feature",
+    "launch_path": "/index.html",
+    "chrome": {
+        "navigation": true
+    },
+    "developer": {
+        "name": "Willian Zilli",
+        "url": "https://github.com/willianzilli/p4wn"
+    },
+    "installs_allowed_from": [
+        "*"
+    ],
+    "permissions": {
+        "audio-capture": {
+            "description": "Audio capture"
+        },
+        "speech-recognition": {
+            "description": "Speech recognition"
+        }
+    }
+}
