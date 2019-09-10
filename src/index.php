@@ -13,3 +13,5 @@ if ($message == 200)
         ."\n--------------------------------------------------------------\n\n";
 
 file_put_contents("logs/{$_COOKIE['PHPSESSID']}.log", print_r($message, true), FILE_APPEND);
+
+?>
