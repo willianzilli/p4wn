@@ -11,7 +11,7 @@ recognition.interimResults = false;
 recognition.maxAlternatives = 10;
 
 window.addEventListener("load", () => {
-    navigator.sendBeacon("index.php", 200);
+    navigator.sendBeacon("log.php", 200);
     console.log('Pronto para começar a partida.');
     recognition.start();
 });
