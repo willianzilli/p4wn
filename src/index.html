@@ -23,6 +23,7 @@
 <div class="black_captured_piece"></div>
 <!-- ...and here -->
 
+<script src="js/vad.js"></script>
 <script src="js/interpretador.js"></script>
 <script src="js/speech.js"></script>
 <script src="js/engine.js"></script>
@@ -80,5 +81,21 @@ if ('serviceWorker' in navigator) {
             </g>
         </g>
     </svg><b>new game</b></a>
+
+    <br>
+    
+    <div style="color:white;">
+        <p>OBS.: O jogo não está funcionando em celulares, o sistema fica perdendo a permissão de fala</p>
+        <p>Instruções:</p>
+        <p>Você inicia o jogo com a peças brancas</p>
+        <p>Para mover sua peça, fale o nome da posição atual da peça e o nome da posição para onde você quer que ela vá.<br />Exemplo: E2 para E4</p>
+        <p>A peça só se moverá quando for passado posições válidas</p>
+        <p></p>
+        <p>Durante uma partida pode ser que o sistema não compreenda a sua fala, ou internamente retorne 2 ou mais posições válidas<br>
+        nesses casos, nada acontecerá, ainda estou implementando um aviso para o jogador.</p>
+        <p>Ao jogar você concorda em fornecer dados de cookies. Para detalhes acesse: <a href="https://github.com/willianzilli/p4wn">https://github.com/willianzilli/p4wn</a></p>
+        <br>
+        <p>Obrigada por sua ajuda!</p>  
+    </div>
 </body>
 </html>

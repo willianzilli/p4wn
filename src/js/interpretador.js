@@ -14,8 +14,11 @@ const conjuncoes = ["NA", "PARA", "CAPTURA", "VAI PARA"];
 class Interpretador {
     entry(speechRecognitionResult) {
         let movimentos = [];
+        let transcricoes = [];
 
         Object.values(speechRecognitionResult).forEach(value => {
+            transcricoes.push(value.transcript);
+
             if (value.confidence >= 0.5) {
                 let particulas = this.processaTranscricao(value.transcript);
 
@@ -47,15 +50,26 @@ class Interpretador {
             }
         })
 
-        if (movimentos.length == 1) {
-            return JSON.parse(movimentos[0].object);
-        } else if (movimentos.length == 0) {
+        if (movimentos.length == 0) {
             game.stop_moving_piece();
-            throw Error(`Movement not permited`);
+
+            utterThis.text = "Movimento não permitido.";
+            window.speechSynthesis.speak(utterThis);
+
+            throw Error(JSON.stringify({"message": "Movimento não permitido", "movimento": movimentos, "speechRecognitionResult": transcricoes}));
+        } else if (movimentos.length == 1) {
+            return JSON.parse(movimentos[0].object);
         } else {
-            console.log("HELPPP");
             console.log(movimentos);
-            throw Error("Invalid movement");
+            
+            if (movimentos[0].x > movimentos[1].x) {
+                return JSON.parse(movimentos[0].object);
+            }
+
+            utterThis.text = "Movimento inválido.";
+            window.speechSynthesis.speak(utterThis);
+
+            throw Error(JSON.stringify({"message": "Movimento inválido", "movimento": movimentos, "speechRecognitionResult": speechRecognitionResult}));
         }
     }
 
@@ -64,9 +78,11 @@ class Interpretador {
     processaTranscricao(transcription) {
         let particulas = [];
 
+        transcription = transcription.toString().replace(new RegExp(/[èéêë]/g),"e");
+
         // A vogal 'A' é interpretadas como particulas da sentença
         // As conjunções 'DE' e 'E' são interpretadas como particulas da sentença
-        let entrada = transcription.toString().toUpperCase().replace(/[^A-Z0-9 ]/g, "").trim().split(" ");
+        let entrada = transcription.toUpperCase().replace(/[^A-Z0-9 ]/g, "").trim().split(" ");
 
         // traduz do extenso para numeral
         // Adicionado espaço na frente da palavra para melhor funcionamento do soundex

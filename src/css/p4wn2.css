@@ -31,7 +31,6 @@ body {
   position: relative;
   left: 0px;
   top: 0px;
-  /*border:1px solid red;*/
   float: left;
 }
 
@@ -42,12 +41,10 @@ body {
   overflow: auto;
   max-width: 14em;
   height: 90%;
-  /*border:1px solid blue;*/
 }
 
 .p4wn-controls{
   clear: both;
-  /*border:1px solid green;*/
 }
 
 .p4wn-control-button {
@@ -63,13 +60,23 @@ body {
   cursor: pointer;
 }
 
-.p4wn-wrapper{
-  /*border: 1px solid yellow;*/
+.p4wn-board td:after {
+  content: attr(data-position);
+  position: relative;
+  font-weight: bold;
+  font-family: sans-serif;
+  font-size: 20px;
+  left: 0;
+  top: 0;
+  float: left;
 }
-
-.p4wn-board td:after { content: attr(data-position); position: relative; z-index: 9;font-weight: bold;font-family: sans-serif;font-size: 10px;}
-.p4wn-board td.p4wn-white-square:after { color: black; }
-.p4wn-board td.p4wn-black-square:after { color: white; }
+}
+.p4wn-board td.p4wn-white-square:after,
+.p4wn-board td.p4wn-black-square:after {
+  color: black;
+  padding-top: 5px;
+  padding-left: 5px;
+}
 
 .p4wn2-anime-white-square,
 .p4wn2-anime-black-square {

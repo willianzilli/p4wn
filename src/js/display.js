@@ -143,7 +143,7 @@ _p4d_proto.next_move = function(){
     var mover = this.board_state.to_play;
     if (this.players[mover] == 'computer' &&
         this.auto_play_timeout === undefined){
-        var timeout = (this.players[1 - mover] == 'computer') ? 500: 750;//10;
+        var timeout = (this.players[1 - mover] == 'computer') ? 1000: 750;//10;
         var p4d = this;
         this.auto_play_timeout = window.setTimeout(function(){p4d.computer_move();},
                                                    timeout);
