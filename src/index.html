@@ -23,7 +23,6 @@
 <div class="black_captured_piece"></div>
 <!-- ...and here -->
 
-<script src="js/vad.js"></script>
 <script src="js/interpretador.js"></script>
 <script src="js/speech.js"></script>
 <script src="js/engine.js"></script>
@@ -48,16 +47,16 @@ P4WN_IMAGE_NAMES = [
 var game = p4wnify("board-goes-here");
 game.next_move();
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js', {scope: './'})
-  .then((reg) => {
-    // registration worked
-    console.log('Registration succeeded. Scope is ' + reg.scope);
-  }).catch((error) => {
-    // registration failed
-    console.log('Registration failed with ' + error);
-  });
-}
+// if ('serviceWorker' in navigator) {
+//   navigator.serviceWorker.register('./sw.js', {scope: './'})
+//   .then((reg) => {
+//     // registration worked
+//     console.log('Registration succeeded. Scope is ' + reg.scope);
+//   }).catch((error) => {
+//     // registration failed
+//     console.log('Registration failed with ' + error);
+//   });
+// }
 
 </script>
 <script src="js/resolutionawareness.js"></script>
@@ -85,15 +84,14 @@ if ('serviceWorker' in navigator) {
     <br>
     
     <div style="color:white;">
-        <p>OBS.: O jogo não está funcionando em celulares, o sistema fica perdendo a permissão de fala</p>
         <p>Instruções:</p>
-        <p>Você inicia o jogo com a peças brancas</p>
-        <p>Para mover sua peça, fale o nome da posição atual da peça e o nome da posição para onde você quer que ela vá.<br />Exemplo: E2 para E4</p>
+        <p>As peças brancas iniciam o jogo</p>
+        <p>Para mover a peça, fale o nome da posição atual da peça e o nome da posição para onde você quer que ela vá.<br />Exemplo: E2 para E4</p>
         <p>A peça só se moverá quando for passado posições válidas</p>
         <p></p>
         <p>Durante uma partida pode ser que o sistema não compreenda a sua fala, ou internamente retorne 2 ou mais posições válidas<br>
-        nesses casos, nada acontecerá, ainda estou implementando um aviso para o jogador.</p>
-        <p>Ao jogar você concorda em fornecer dados de cookies. Para detalhes acesse: <a href="https://github.com/willianzilli/p4wn">https://github.com/willianzilli/p4wn</a></p>
+        nesses casos, você receberá uma notificação sonora.</p>
+        <p>Ao jogar você concorda em fornecer dados de cookies sobre a partida. Para mais detalhes olhe o código em: <a href="https://github.com/willianzilli/p4wn">https://github.com/willianzilli/p4wn</a></p>
         <br>
         <p>Obrigada por sua ajuda!</p>  
     </div>

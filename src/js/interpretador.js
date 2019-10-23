@@ -19,18 +19,16 @@ class Interpretador {
         Object.values(speechRecognitionResult).forEach(value => {
             transcricoes.push(value.transcript);
 
-            if (value.confidence >= 0.5) {
-                let particulas = this.processaTranscricao(value.transcript);
+            let particulas = this.processaTranscricao(value.transcript);
 
-                if (particulas.length > 0) {
-                    let particula = JSON.stringify(particulas);
-                    let movimento = null;
+            if (particulas.length > 0) {
+                let particula = JSON.stringify(particulas);
+                let movimento = null;
 
-                    if ((movimento = movimentos.filter((movimento) => movimento.object === particula)).length === 0) {
-                        movimentos.push({object: particula, x: 1});
-                    } else {
-                        movimento[0].x++;
-                    }
+                if ((movimento = movimentos.filter((movimento) => movimento.object === particula)).length === 0) {
+                    movimentos.push({object: particula, x: 1});
+                } else {
+                    movimento[0].x++;
                 }
             }
         });
@@ -46,30 +44,25 @@ class Interpretador {
         movimentos.forEach((v, k) => {
             let movimento = JSON.parse(v.object);
             if (!game.valid_move(movimento)) {
-                movimentos.splice(k);
+                movimentos.splice(k, 1);
             }
         })
 
         if (movimentos.length == 0) {
             game.stop_moving_piece();
 
-            utterThis.text = "Movimento não permitido.";
-            window.speechSynthesis.speak(utterThis);
-
-            throw Error(JSON.stringify({"message": "Movimento não permitido", "movimento": movimentos, "speechRecognitionResult": transcricoes}));
-        } else if (movimentos.length == 1) {
-            return JSON.parse(movimentos[0].object);
-        } else {
-            console.log(movimentos);
-            
-            if (movimentos[0].x > movimentos[1].x) {
-                return JSON.parse(movimentos[0].object);
-            }
-
             utterThis.text = "Movimento inválido.";
             window.speechSynthesis.speak(utterThis);
 
-            throw Error(JSON.stringify({"message": "Movimento inválido", "movimento": movimentos, "speechRecognitionResult": speechRecognitionResult}));
+            throw Error(JSON.stringify({"message": "Movimento inválido", "movimento": movimentos, "speechRecognitionResult": transcricoes}));
+        } else if (movimentos.length == 1) {
+            return JSON.parse(movimentos[0].object);
+        } else {
+            if (movimentos[0].x < movimentos[1].x) {
+                throw Error(JSON.stringify({"message": "Movimento inválido", "movimento": movimentos, "speechRecognitionResult": speechRecognitionResult}));
+            }
+
+            return JSON.parse(movimentos[0].object);
         }
     }
 
@@ -131,7 +124,7 @@ class Interpretador {
                 m: 5, n: 5,
                 r: 6
             };
-    
+
         r = f +
             a
             .map(function (v, i, a) { return codes[v] })

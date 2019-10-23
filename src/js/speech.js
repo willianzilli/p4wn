@@ -1,3 +1,5 @@
+var semaphre = false;
+
 var recognition = new webkitSpeechRecognition();
 var interpretador = new Interpretador();
 var utterThis = new SpeechSynthesisUtterance();
@@ -23,67 +25,56 @@ window.mobilecheck = function() {
 window.addEventListener("load", () => {
     navigator.sendBeacon("https://p4wn-willianzilli.000webhostapp.com/log.php", 200);
     
-    if (window.mobilecheck) {
-        document.addEventListener('click', () => {
-            recognition.start();
-        }, false);
-    }
+    document.addEventListener('click', () => {
+        recognition.start();
+    }, false);
 });
 
 recognition.onresult = function(event) {
     var last = event.results.length - 1;
 
-    try {
-        console.log(event.results[last]);
-
-        let movimento = interpretador.entry(event.results[last]);
-
-        navigator.sendBeacon("https://p4wn-willianzilli.000webhostapp.com/log.php", JSON.stringify(movimento));
-
-        if (movimento.length == 2) {
-            game.square_clicked(movimento[0].pos);
-            game.square_clicked(movimento[1].pos);
-        }
-        
-        if (game.players[game.board_state.to_play] !== "human") {
-            recognition.stop();
+    if (!semaphre) {
+        semaphre = true;
     
-            if (window.mobilecheck) {
-                new Promise(async (resolve) => {
-                    while(game.players[game.board_state.to_play] !== "human") {
-                        await new Promise((resolve) => setTimeout(resolve, 1000));
-                        if (game.players[game.board_state.to_play] === "human") {
-                            resolve(true);
-                        }
-                    }
-                }).then(() => {
-                    utterThis.text = "Sua vez de jogar";
-                    window.speechSynthesis.speak(utterThis);
-                    
-                    recognition.start();
-                });
+        try {
+            let movimento = interpretador.entry(event.results[last]);
+            
+            navigator.sendBeacon("https://p4wn-willianzilli.000webhostapp.com/log.php", JSON.stringify(movimento));
+
+            if (movimento.length == 2) {
+                game.square_clicked(movimento[0].pos);
+                game.square_clicked(movimento[1].pos);
             }
+        } catch(e) {
+            navigator.sendBeacon("https://p4wn-willianzilli.000webhostapp.com/log.php", JSON.stringify(e));
+            console.warn(e);
         }
-    } catch(e) {
-        navigator.sendBeacon("https://p4wn-willianzilli.000webhostapp.com/log.php", JSON.stringify(e));
-        console.warn(e);
+
+        recognition.stop();
     }
 };
 
-recognition.onstop = function() {
-    utterThis.text = "Toque na tela para jogar.";
-    window.speechSynthesis.speak(utterThis);
-    
-    // recognition.stop();
-};
+recognition.addEventListener('speechend', function() {
+    semaphre = false;
 
-recognition.onspeechend = function() {
-    if (game.players[game.board_state.to_play] === "human") {
-        // recognition.stop();
+    if (game.players[game.board_state.to_play] !== "human") {
+        new Promise(async (resolve) => {
+            while(game.players[game.board_state.to_play] !== "human") {
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+                if (game.players[game.board_state.to_play] === "human") {
+                    resolve(true);
+                }
+            }
+        }).then(() => {
+            utterThis.text = "Sua vez de jogar";
+            window.speechSynthesis.speak(utterThis);
+            
+            recognition.start();
+        });
     }
-}
+}, false);
 
-recognition.onerror = async function(event) {
+recognition.addEventListener('error', async function(event) {
     if (event.error == "no-speech") {
         if (game.players[game.board_state.to_play] === "human") {
             await new Promise((resolve) => setTimeout(resolve, 500));
@@ -96,13 +87,4 @@ recognition.onerror = async function(event) {
     } else {
         console.log(event.error);
     }
-}
-
-// recognition.onend = async function() {
-//     await new Promise((resolve) => setTimeout(resolve, 750));
-//     try {
-        
-//     } catch (e) {
-//         recognition.onspeechend();
-//     }
-// }
+}, false);
