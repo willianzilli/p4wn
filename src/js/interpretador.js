@@ -25,8 +25,8 @@ class Interpretador {
                 let particula = JSON.stringify(particulas);
                 let movimento = null;
 
-                if ((movimento = movimentos.filter((movimento) => movimento.object === particula)).length === 0) {
-                    movimentos.push({object: particula, x: 1});
+                if ((movimento = movimentos.filter((movimento) => movimento.particula === particula)).length === 0) {
+                    movimentos.push({object: particulas, particula: particula, x: 1});
                 } else {
                     movimento[0].x++;
                 }
@@ -41,8 +41,12 @@ class Interpretador {
             return (a.x > b.x) ? -1 : (a.x < b.x) ? 1 : 0;
         });
 
+        let logMovimentos = Object.assign({}, movimentos);
+
+        log = Object.assign(log, { partial: logMovimentos });
+
         movimentos.forEach((v, k) => {
-            let movimento = JSON.parse(v.object);
+            let movimento = JSON.parse(v.particula);
             if (!game.valid_move(movimento)) {
                 movimentos.splice(k, 1);
             }
@@ -56,13 +60,13 @@ class Interpretador {
 
             throw Error(JSON.stringify({"message": "Movimento inválido", "movimento": movimentos, "speechRecognitionResult": transcricoes}));
         } else if (movimentos.length == 1) {
-            return JSON.parse(movimentos[0].object);
+            return JSON.parse(movimentos[0].particula);
         } else {
             if (movimentos[0].x < movimentos[1].x) {
                 throw Error(JSON.stringify({"message": "Movimento inválido", "movimento": movimentos, "speechRecognitionResult": speechRecognitionResult}));
             }
 
-            return JSON.parse(movimentos[0].object);
+            return JSON.parse(movimentos[0].particula);
         }
     }
 
@@ -71,7 +75,8 @@ class Interpretador {
     processaTranscricao(transcription) {
         let particulas = [];
 
-        transcription = transcription.toString().replace(new RegExp(/[èéêë]/g),"e");
+        transcription = transcription.toString().replace(new RegExp(/[èéêÈÉÊ]/g),"E");
+        transcription = transcription.toString().replace(new RegExp(/[ãáâÃÁÂ]/g),"A");
 
         // A vogal 'A' é interpretadas como particulas da sentença
         // As conjunções 'DE' e 'E' são interpretadas como particulas da sentença
@@ -124,6 +129,8 @@ class Interpretador {
                 m: 5, n: 5,
                 r: 6
             };
+
+        f = f.replace("P", "B");
 
         r = f +
             a

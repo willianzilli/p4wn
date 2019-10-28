@@ -1,4 +1,5 @@
 var semaphre = false;
+var log = {};
 
 var recognition = new webkitSpeechRecognition();
 var interpretador = new Interpretador();
@@ -35,11 +36,22 @@ recognition.onresult = function(event) {
 
     if (!semaphre) {
         semaphre = true;
-    
+
         try {
+            log = {};
+            let raw = [];
+
+            Object.values(event.results[last]).forEach(value => {
+                raw.push({transcript: value.transcript});
+            });
+
+            log = Object.assign(log, { raw: raw});
+
             let movimento = interpretador.entry(event.results[last]);
-            
-            navigator.sendBeacon("https://p4wn-willianzilli.000webhostapp.com/log.php", JSON.stringify(movimento));
+
+            log = Object.assign(log, { final: movimento });
+
+            navigator.sendBeacon("https://p4wn-willianzilli.000webhostapp.com/log.php", JSON.stringify(log));
 
             if (movimento.length == 2) {
                 game.square_clicked(movimento[0].pos);
