@@ -23,6 +23,16 @@
 <div class="black_captured_piece"></div>
 <!-- ...and here -->
 
+<script>    
+if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+    Notification.requestPermission(function (permission) {
+        if (permission === "granted") {
+            new Notification("Para iníciar o jogo, clique/toque na tela.");
+        }
+    });
+}
+</script>
+
 <script src="js/interpretador.js"></script>
 <script src="js/speech.js"></script>
 <script src="js/engine.js"></script>

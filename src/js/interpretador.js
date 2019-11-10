@@ -9,7 +9,7 @@ var posicoes = {
     "A1": {name: "A1", pos: 21, soundex: "A500"}, "B1": {name: "B1", pos: 22, soundex: "B500"}, "C1": {name: "C1", pos: 23, soundex: "C500"}, "D1": {name: "D1", pos: 24, soundex: "D500"}, "E1": {name: "E1", pos: 25, soundex: "E500"}, "F1": {name: "F1", pos: 26, soundex: "F500"}, "G1": {name: "G1", pos: 27, soundex: "G500"}, "H1": {name: "H1", pos: 28, soundex: "H500"},
 }
 
-const conjuncoes = ["NA", "PARA", "CAPTURA", "VAI PARA"];
+const conjuncoes = ["PARA", "CAPTURA", "VAI PARA"];
 
 class Interpretador {
     entry(speechRecognitionResult) {
@@ -34,7 +34,12 @@ class Interpretador {
         });
 
         if (movimentos.length == 0) {
-            return [];
+            game.stop_moving_piece();
+
+            utterThis.text = "Movimento inválido.";
+            window.speechSynthesis.speak(utterThis);
+
+            throw Error(JSON.stringify({"message": "Movimento inválido", "movimento": movimentos, "speechRecognitionResult": transcricoes}));
         }
 
         movimentos.sort((a, b) => {
@@ -52,20 +57,14 @@ class Interpretador {
             }
         })
 
-        if (movimentos.length == 0) {
+        if (movimentos.length == 0 || JSON.parse(movimentos[0].particula).length != 2) {
             game.stop_moving_piece();
 
             utterThis.text = "Movimento inválido.";
             window.speechSynthesis.speak(utterThis);
 
             throw Error(JSON.stringify({"message": "Movimento inválido", "movimento": movimentos, "speechRecognitionResult": transcricoes}));
-        } else if (movimentos.length == 1) {
-            return JSON.parse(movimentos[0].particula);
         } else {
-            if (movimentos[0].x < movimentos[1].x) {
-                throw Error(JSON.stringify({"message": "Movimento inválido", "movimento": movimentos, "speechRecognitionResult": speechRecognitionResult}));
-            }
-
             return JSON.parse(movimentos[0].particula);
         }
     }

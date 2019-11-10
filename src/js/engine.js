@@ -987,6 +987,7 @@ function p4_move(state, s, e, promotion){
     if (p4_check_check(state, colour)){
         p4_unmake_move(state, changes);
         p4_log('in check', changes);
+
         return {flags: P4_MOVE_ILLEGAL, ok: false, string: "in check!"};
     }
     /*The move is known to be legal. We won't be undoing it.*/
@@ -1023,6 +1024,14 @@ function p4_move(state, s, e, promotion){
 
     if (p4_check_check(state, other_colour)){
         flags |= P4_MOVE_FLAG_CHECK;
+
+        if (game.board_state.to_play === 0) {
+            utterThis.text = "Rei branco está em cheque";
+        } else {
+            utterThis.text = "Rei preto está em cheque";
+        }
+
+        window.speechSynthesis.speak(utterThis);
     }
     /* check for (stale|check)mate, by seeing if there is a move for
      * the other side that doesn't result in check. (In other words,
@@ -1046,8 +1055,9 @@ function p4_move(state, s, e, promotion){
             break;
         }
     }
-    if (is_mate)
+    if (is_mate) {
         flags |= P4_MOVE_FLAG_MATE;
+    }
 
     var movestring = p4_move2string(state, s, e, S, promotion, flags, moves);
     p4_log("successful move", Object.keys(posicoes).find(key => posicoes[key].pos === s) + " -> " + Object.keys(posicoes).find(key => posicoes[key].pos === e) + " | Notation: "+ movestring + " | Flag: "+ flags);

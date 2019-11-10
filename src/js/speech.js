@@ -4,7 +4,8 @@ var log = {};
 var recognition = new webkitSpeechRecognition();
 var interpretador = new Interpretador();
 var utterThis = new SpeechSynthesisUtterance();
-var voices = window.speechSynthesis.getVoices();
+var speechSynthesis = window.speechSynthesis;
+var voices = speechSynthesis.getVoices();
 
 utterThis.voice = voices[10];
 utterThis.pitch = 1;
@@ -25,11 +26,21 @@ window.mobilecheck = function() {
 
 window.addEventListener("load", () => {
     navigator.sendBeacon("https://p4wn-willianzilli.000webhostapp.com/log.php", 200);
-    
+
+    new Notification("Para iníciar o jogo, clique/toque na tela.");
+
     document.addEventListener('click', () => {
         recognition.start();
     }, false);
 });
+
+function restart() {
+    recognition.start();
+}
+
+utterThis.addEventListener('end', function() {
+    recognition.start();
+}, false);
 
 recognition.onresult = function(event) {
     var last = event.results.length - 1;
@@ -41,16 +52,19 @@ recognition.onresult = function(event) {
             log = {};
             let raw = [];
 
+            recognition.stop();
+
             Object.values(event.results[last]).forEach(value => {
                 raw.push({transcript: value.transcript});
             });
 
-            log = Object.assign(log, { raw: raw});
+            console.log(event.results[last]);
+
+            log = Object.assign(log, {raw: raw});
 
             let movimento = interpretador.entry(event.results[last]);
 
             log = Object.assign(log, { final: movimento });
-
             navigator.sendBeacon("https://p4wn-willianzilli.000webhostapp.com/log.php", JSON.stringify(log));
 
             if (movimento.length == 2) {
@@ -61,29 +75,20 @@ recognition.onresult = function(event) {
             navigator.sendBeacon("https://p4wn-willianzilli.000webhostapp.com/log.php", JSON.stringify(e));
             console.warn(e);
         }
-
-        recognition.stop();
     }
 };
 
 recognition.addEventListener('speechend', function() {
-    semaphre = false;
-
-    if (game.players[game.board_state.to_play] !== "human") {
-        new Promise(async (resolve) => {
-            while(game.players[game.board_state.to_play] !== "human") {
-                await new Promise((resolve) => setTimeout(resolve, 2000));
-                if (game.players[game.board_state.to_play] === "human") {
-                    resolve(true);
-                }
+    new Promise(async (resolve) => {
+        while(game.players[game.board_state.to_play] !== "human") {
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            if (game.players[game.board_state.to_play] === "human") {
+                resolve(true);
             }
-        }).then(() => {
-            utterThis.text = "Sua vez de jogar";
-            window.speechSynthesis.speak(utterThis);
-            
-            recognition.start();
-        });
-    }
+        }
+    });
+    
+    semaphre = false;
 }, false);
 
 recognition.addEventListener('error', async function(event) {

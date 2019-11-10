@@ -11,6 +11,15 @@
  */
 /* The routines here draw the screen and handle user interaction */
 
+var pieces_name = {
+    2: "Peão",
+    4: "Torre",
+    6: "Cavalo",
+    8: "Bispo",
+    10: "Rei",
+    12: "Rainha"
+}
+
 var P4WN_SQUARE_WIDTH = 30;
 var P4WN_SQUARE_HEIGHT = 30;
 var P4WN_WRAPPER_CLASS = 'p4wn-wrapper';
@@ -168,6 +177,14 @@ _p4d_proto.computer_move = function(){
             p4_log("retry at depth", depth, " total time:", delta);
         }
     }
+
+    piece_name = pieces_name[this.board_state.board[mv[0]] - 1];
+    from = Object.values(posicoes).filter(v => v.pos == mv[0])[0].name;
+    to = Object.values(posicoes).filter(v => v.pos == mv[1])[0].name;
+
+    utterThis.text = `${piece_name} ${from} para ${to}`;
+    speechSynthesis.speak(utterThis);
+
     this.move(mv[0], mv[1]);
 };
 
